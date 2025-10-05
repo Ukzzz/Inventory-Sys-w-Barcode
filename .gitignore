@@ -1,7 +1,18 @@
+# Node modules
 node_modules/
+
+# Local data folder
 data/
+
+# Environment config
 config.env
+
+# macOS system files
 .DS_Store
+
+# npm debug logs
 npm-debug.log
+
+# IDE settings
 .idea/
 .vscode/
