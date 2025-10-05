@@ -1,2 +1,7 @@
-node_modules
-config.env 
+node_modules/
+data/
+.env
+.DS_Store
+npm-debug.log
+.idea/
+.vscode/
