@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Uniform Inventory System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/dashboard" class="text-white text-xl font-bold">
+                        <i class="fas fa-boxes mr-2"></i>
+                        Uniform Inventory
+                    </a>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/dashboard" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+                    </a>
+                    <a href="/inventory" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-warehouse mr-1"></i> Inventory
+                    </a>
+                    <a href="/delivery/scan" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-qrcode mr-1"></i> Scan Delivery
+                    </a>
+                    <a href="/delivery/history" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-history mr-1"></i> Delivery History
+                    </a>
+                    <a href="/reports" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-chart-bar mr-1"></i> Reports
+                    </a>
+                    
+                    <% if (user.role === 'admin') { %>
+                    <a href="/register" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-user-plus mr-1"></i> Add User
+                    </a>
+                    <% } %>
+                    
+                    <!-- User Info -->
+                    <div class="text-white px-3 py-2 flex items-center">
+                        <i class="fas fa-user mr-2"></i>
+                        <span class="mr-1"><%= user.username %></span>
+                        <span class="text-xs text-blue-200">(<%= user.role %>)</span>
+                    </div>
+                    
+                    <!-- Logout Button -->
+                    <form method="POST" action="/logout" class="inline">
+                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-medium transition duration-150 ease-in-out flex items-center">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            Logout
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="text-white hover:text-blue-200 focus:outline-none focus:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-blue-700">
+                <a href="/dashboard" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                </a>
+                <a href="/inventory" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-warehouse mr-2"></i> Inventory
+                </a>
+                <a href="/delivery/scan" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-qrcode mr-2"></i> Scan Delivery
+                </a>
+                <a href="/delivery/history" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-history mr-2"></i> Delivery History
+                </a>
+                <a href="/reports" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-chart-bar mr-2"></i> Reports
+                </a>
+                <% if (user.role === 'admin') { %>
+                <a href="/register" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-user-plus mr-2"></i> Add User
+                </a>
+                <% } %>
+                <form method="POST" action="/logout" class="block">
+                    <button type="submit" class="w-full text-left text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Welcome Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back, <%= user.username %>!
+        </h1>
+        <p class="text-gray-600">
+            Here's an overview of your uniform inventory system
+        </p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Items -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-boxes text-white text-sm"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Total Items</p>
+                    <p class="text-2xl font-bold text-gray-900"><%= stats.totalItems || 0 %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Stock -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-warehouse text-white text-sm"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Total Stock</p>
+                    <p class="text-2xl font-bold text-gray-900"><%= stats.totalStock || 0 %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Items -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Low Stock</p>
+                    <p class="text-2xl font-bold text-gray-900"><%= stats.lowStockItems || 0 %></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Deliveries -->
+        <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shipping-fast text-white text-sm"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Today's Deliveries</p>
+                    <p class="text-2xl font-bold text-gray-900"><%= stats.todayDeliveries || 0 %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <% if (user.role === 'admin') { %>
+            <a href="/inventory/add" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-center transition duration-150 ease-in-out">
+                <i class="fas fa-plus text-2xl mb-2"></i>
+                <p class="font-medium">Add New Item</p>
+            </a>
+            <% } %>
+            <a href="/delivery/scan" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg text-center transition duration-150 ease-in-out">
+                <i class="fas fa-qrcode text-2xl mb-2"></i>
+                <p class="font-medium">Scan Delivery</p>
+            </a>
+            <a href="/reports" class="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-lg text-center transition duration-150 ease-in-out">
+                <i class="fas fa-chart-bar text-2xl mb-2"></i>
+                <p class="font-medium">Generate Report</p>
+            </a>
+            <a href="/inventory" class="bg-orange-500 hover:bg-orange-600 text-white p-4 rounded-lg text-center transition duration-150 ease-in-out">
+                <i class="fas fa-warehouse text-2xl mb-2"></i>
+                <p class="font-medium">View Inventory</p>
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Deliveries -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-900">Recent Deliveries</h2>
+                <a href="/delivery/history" class="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                    View All <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            
+            <% if (recentDeliveries && recentDeliveries.length > 0) { %>
+                <div class="space-y-3">
+                    <% recentDeliveries.forEach(delivery => { %>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-shipping-fast text-green-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900"><%= delivery.customerName %></p>
+                                    <p class="text-sm text-gray-500"><%= delivery.inventoryItem.itemName %></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">Qty: <%= delivery.quantityDelivered %></p>
+                                <p class="text-xs text-gray-500"><%= new Date(delivery.deliveryDate).toLocaleDateString() %></p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-8">
+                    <i class="fas fa-shipping-fast text-gray-300 text-4xl mb-4"></i>
+                    <p class="text-gray-500">No recent deliveries</p>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Low Stock Items -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-900">Low Stock Items</h2>
+                <a href="/inventory?lowStock=true" class="text-blue-600 hover:text-blue-500 text-sm font-medium">
+                    View All <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            
+            <% if (lowStockList && lowStockList.length > 0) { %>
+                <div class="space-y-3">
+                    <% lowStockList.forEach(item => { %>
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900"><%= item.itemName %></p>
+                                    <p class="text-sm text-gray-500"><%= item.category %> - <%= item.size %></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-yellow-600"><%= item.quantity %></p>
+                                <p class="text-xs text-gray-500">remaining</p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-8">
+                    <i class="fas fa-check-circle text-green-300 text-4xl mb-4"></i>
+                    <p class="text-gray-500">All items are well stocked</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Category Stock Overview -->
+    <% if (categoryStock && categoryStock.length > 0) { %>
+    <div class="bg-white rounded-lg shadow-md p-6 mt-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Stock by Category</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <% categoryStock.forEach(category => { %>
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-tshirt text-blue-600"></i>
+                    </div>
+                    <h3 class="font-medium text-gray-900"><%= category._id %></h3>
+                    <p class="text-2xl font-bold text-blue-600"><%= category.totalQuantity %></p>
+                    <p class="text-sm text-gray-500"><%= category.itemCount %> items</p>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+    <% } %>
+</div>
+
+<script>
+    // Auto-refresh stats every 30 seconds
+    setInterval(function() {
+        fetch('/dashboard/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update stats cards
+                    document.querySelector('.grid .bg-white:nth-child(1) .text-2xl').textContent = data.stats.totalItems;
+                    document.querySelector('.grid .bg-white:nth-child(2) .text-2xl').textContent = data.stats.totalStock;
+                    document.querySelector('.grid .bg-white:nth-child(3) .text-2xl').textContent = data.stats.lowStockItems;
+                    document.querySelector('.grid .bg-white:nth-child(4) .text-2xl').textContent = data.stats.todayDeliveries;
+                }
+            })
+            .catch(error => console.error('Error updating stats:', error));
+    }, 30000);
+
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.querySelector('.md\\:hidden button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        // User dropdown toggle
+        const userButton = document.querySelector('.relative button');
+        const userDropdown = document.querySelector('.relative .absolute');
+        
+        if (userButton && userDropdown) {
+            userButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userButton.contains(event.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-white py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <p>&copy; 2024 Uniform Inventory System. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Custom JavaScript -->
+<script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Uniform Inventory System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/dashboard" class="text-white text-xl font-bold">
+                        <i class="fas fa-boxes mr-2"></i>
+                        Uniform Inventory
+                    </a>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/dashboard" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+                    </a>
+                    <a href="/inventory" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-warehouse mr-1"></i> Inventory
+                    </a>
+                    <a href="/delivery/scan" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-qrcode mr-1"></i> Scan Delivery
+                    </a>
+                    <a href="/delivery/history" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-history mr-1"></i> Delivery History
+                    </a>
+                    <a href="/reports" class="text-white hover:text-blue-200 px-3 py-2 rounded-md bg-blue-700">
+                        <i class="fas fa-chart-bar mr-1"></i> Reports
+                    </a>
+                    
+                    <% if (user.role === 'admin') { %>
+                    <a href="/register" class="text-white hover:text-blue-200 px-3 py-2 rounded-md">
+                        <i class="fas fa-user-plus mr-1"></i> Add User
+                    </a>
+                    <% } %>
+                    
+                    <!-- User Info -->
+                    <div class="text-white px-3 py-2 flex items-center">
+                        <i class="fas fa-user mr-2"></i>
+                        <span class="mr-1"><%= user.username %></span>
+                        <span class="text-xs text-blue-200">(<%= user.role %>)</span>
+                    </div>
+                    
+                    <!-- Logout Button -->
+                    <form method="POST" action="/logout" class="inline">
+                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-medium transition duration-150 ease-in-out flex items-center">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            Logout
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="text-white hover:text-blue-200 focus:outline-none focus:text-blue-200">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-blue-700">
+                <a href="/dashboard" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                </a>
+                <a href="/inventory" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-warehouse mr-2"></i> Inventory
+                </a>
+                <a href="/delivery/scan" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-qrcode mr-2"></i> Scan Delivery
+                </a>
+                <a href="/delivery/history" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-history mr-2"></i> Delivery History
+                </a>
+                <a href="/reports" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md bg-blue-600">
+                    <i class="fas fa-chart-bar mr-2"></i> Reports
+                </a>
+                <% if (user.role === 'admin') { %>
+                <a href="/register" class="text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                    <i class="fas fa-user-plus mr-2"></i> Add User
+                </a>
+                <% } %>
+                <form method="POST" action="/logout" class="block">
+                    <button type="submit" class="w-full text-left text-white hover:text-blue-200 block px-3 py-2 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Generate Reports</h1>
+        <p class="text-gray-600">Export delivery and inventory reports in Excel or PDF format</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Delivery Reports -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-shipping-fast text-green-600 text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Delivery Reports</h2>
+                    <p class="text-gray-600">Export delivery history and statistics</p>
+                </div>
+            </div>
+
+            <form method="GET" action="/reports/delivery/excel" class="space-y-4">
+                <div>
+                    <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">
+                        Start Date
+                    </label>
+                    <input type="date" id="startDate" name="startDate" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">
+                        End Date
+                    </label>
+                    <input type="date" id="endDate" name="endDate" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">
+                        Customer Name (Optional)
+                    </label>
+                    <input type="text" id="customerName" name="customerName" 
+                           placeholder="Filter by customer name"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <div class="flex space-x-2 pt-4">
+                    <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition duration-150 ease-in-out">
+                        <i class="fas fa-file-excel mr-2"></i>
+                        Export Excel
+                    </button>
+                    <a href="#" id="delivery-pdf-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium transition duration-150 ease-in-out text-center">
+                        <i class="fas fa-file-pdf mr-2"></i>
+                        Export PDF
+                    </a>
+                </div>
+            </form>
+
+            <!-- PDF Form (Hidden) -->
+            <form id="delivery-pdf-form" method="GET" action="/reports/delivery/pdf" style="display: none;">
+                <input type="date" name="startDate" id="pdfStartDate">
+                <input type="date" name="endDate" id="pdfEndDate">
+                <input type="text" name="customerName" id="pdfCustomerName">
+            </form>
+        </div>
+
+        <!-- Inventory Reports -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-warehouse text-blue-600 text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Inventory Reports</h2>
+                    <p class="text-gray-600">Export current inventory status</p>
+                </div>
+            </div>
+
+            <form method="GET" action="/reports/inventory/excel" class="space-y-4">
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">
+                        Category Filter
+                    </label>
+                    <select id="category" name="category" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">All Categories</option>
+                        <option value="T-Shirt">T-Shirt</option>
+                        <option value="Jacket">Jacket</option>
+                        <option value="Cap">Cap</option>
+                        <option value="Trousers">Trousers</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Additional Filters
+                    </label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="lowStock" value="true" 
+                                   class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <span class="ml-2 text-sm text-gray-700">Show only low stock items (≤10)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition duration-150 ease-in-out">
+                        <i class="fas fa-file-excel mr-2"></i>
+                        Export Excel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Report Information -->
+    <div class="mt-8 bg-gray-50 rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">
+            <i class="fas fa-info-circle mr-2"></i>
+            Report Information
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h4 class="font-medium text-gray-900 mb-2">Excel Reports (.xlsx)</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Detailed tabular data with all fields</li>
+                    <li>• Sortable and filterable columns</li>
+                    <li>• Compatible with Excel, Google Sheets, and other spreadsheet applications</li>
+                    <li>• Best for data analysis and further processing</li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="font-medium text-gray-900 mb-2">PDF Reports (.pdf)</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Formatted for printing and sharing</li>
+                    <li>• Professional layout with headers and footers</li>
+                    <li>• Summary statistics and totals</li>
+                    <li>• Best for presentations and official documentation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shipping-fast text-white text-sm"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Total Deliveries</p>
+                    <p class="text-2xl font-bold text-gray-900" id="total-deliveries">-</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-boxes text-white text-sm"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Total Items</p>
+                    <p class="text-2xl font-bold text-gray-900" id="total-items">-</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white text-sm"></i>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">This Month's Deliveries</p>
+                    <p class="text-2xl font-bold text-gray-900" id="month-deliveries">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default date range (last 30 days)
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+    
+    document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+    document.getElementById('endDate').value = today.toISOString().split('T')[0];
+    
+    // PDF form handling
+    document.getElementById('delivery-pdf-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Copy values from Excel form to PDF form
+        document.getElementById('pdfStartDate').value = document.getElementById('startDate').value;
+        document.getElementById('pdfEndDate').value = document.getElementById('endDate').value;
+        document.getElementById('pdfCustomerName').value = document.getElementById('customerName').value;
+        
+        // Submit PDF form
+        document.getElementById('delivery-pdf-form').submit();
+    });
+    
+    // Load quick stats
+    loadQuickStats();
+});
+
+function loadQuickStats() {
+    // Load dashboard stats
+    fetch('/dashboard/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('total-deliveries').textContent = data.stats.totalDeliveries || 0;
+                document.getElementById('total-items').textContent = data.stats.totalItems || 0;
+                document.getElementById('month-deliveries').textContent = data.stats.thisMonthDeliveries || 0;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading stats:', error);
+        });
+}
+
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.querySelector('.md\\:hidden button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        // User dropdown toggle
+        const userButton = document.querySelector('.relative button');
+        const userDropdown = document.querySelector('.relative .absolute');
+        
+        if (userButton && userDropdown) {
+            userButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userButton.contains(event.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>
+
+<!-- Footer -->
+<footer class="bg-gray-800 text-white py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <p>&copy; 2024 Uniform Inventory System. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Custom JavaScript -->
+<script src="/js/app.js"></script>
+</body>
+</html>
